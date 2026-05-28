@@ -3,645 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Storyboard</title>
-<script src="https://tableau.github.io/extensions-api/lib/tableau.extensions.1.latest.js"></script>
-<script>
-// Fallback: if tableau.github.io is blocked, try loading from unpkg
-window.addEventListener('load', function() {
-  if (typeof window.tableau === 'undefined') {
-    var s = document.createElement('script');
-    s.src = 'https://unpkg.com/@tableau/extensions-api@1.12.0/lib/tableau.extensions.1.latest.js';
-    s.onload = function() { console.log('Loaded from unpkg fallback'); };
-    document.head.appendChild(s);
-  }
-});
-</script>
+<title>Tableau Storyboard</title>
 <style>
-/* ── RESET & BASE ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --navy: #003666;
-  --blue: #1473E6;
-  --blue-l: #EAF3FE;
-  --blue-m: #B8D5F7;
-  --green: #1E7E5E;
-  --green-l: #E8F7F2;
-  --amber: #B86A00;
-  --amber-l: #FEF5E7;
-  --red: #C5373E;
-  --red-l: #FEF0F1;
-  --text: #1A1D23;
-  --text-m: #5A6070;
-  --text-l: #9299A8;
-  --border: #E2E4E9;
-  --bg: #F4F5F7;
-  --surface: #FFFFFF;
-  --orange: #E86427;
-  --radius: 10px;
-  --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-  --shadow-l: 0 12px 40px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.06);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#003666;--blue:#1473E6;--blue-d:#0d66d0;--blue-l:#EAF3FE;--blue-m:#B8D5F7;
+  --green:#1E7E5E;--green-l:#E8F7F2;--green-m:#A8DDD0;
+  --amber:#B86A00;--amber-l:#FEF5E7;--amber-m:#F5C842;
+  --red:#C5373E;--red-l:#FEF0F1;
+  --text:#1A1D23;--text-m:#5A6070;--text-l:#9299A8;
+  --border:#E2E4E9;--border-m:#C8CCD6;
+  --bg:#F4F5F7;--surface:#FFFFFF;
+  --orange:#E86427;
+  --radius:10px;--radius-s:6px;
+  --shadow:0 2px 8px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);
+  --shadow-l:0 12px 40px rgba(0,0,0,0.14),0 4px 12px rgba(0,0,0,0.06);
 }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
 
-/* ── LAUNCH PANEL ── */
-.launch-panel {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 32px 28px;
-  width: 320px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-.launch-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.launch-logo svg { width: 28px; height: 28px; }
-.launch-logo-text { font-size: 15px; font-weight: 600; color: var(--navy); }
-.launch-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-  line-height: 1.3;
-}
-.launch-sub {
-  font-size: 13px;
-  color: var(--text-m);
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-.launch-features {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 24px;
-  text-align: left;
-}
-.feature-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12.5px;
-  color: var(--text-m);
-}
-.feature-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.api-section {
-  margin-bottom: 20px;
-  text-align: left;
-}
-.api-label {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-l);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin-bottom: 6px;
-}
-.api-input {
-  width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: 7px;
-  padding: 8px 11px;
-  font-family: "SF Mono", "Fira Code", monospace;
-  font-size: 12px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color .15s;
-}
-.api-input:focus { border-color: var(--blue); background: var(--surface); }
-.api-hint { font-size: 10.5px; color: var(--text-l); margin-top: 4px; line-height: 1.4; }
-.generate-btn {
-  width: 100%;
-  padding: 11px;
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background .15s;
-}
-.generate-btn:hover { background: #0d66d0; }
-.generate-btn:disabled { background: var(--border); color: var(--text-l); cursor: default; }
-.trust-note {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 10.5px;
-  color: var(--text-l);
-  margin-top: 12px;
-}
+/* NAV */
+.nav{height:44px;background:var(--navy);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
+.nav-logo{display:flex;align-items:center;gap:7px;color:#fff;font-size:13px;font-weight:600;}
+.nav-logo svg{width:20px;height:20px;}
 
-/* ── LOADING STATE ── */
-.loading-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,20,50,.55);
-  backdrop-filter: blur(4px);
-  z-index: 100;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-.loading-overlay.visible { display: flex; }
-.loading-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 28px 32px;
-  width: 340px;
-  text-align: center;
-  box-shadow: var(--shadow-l);
-}
-.loading-spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid var(--border);
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-}
-.loading-step {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12.5px;
-  color: var(--text-l);
-  transition: color .3s;
-}
-.loading-step.active { color: var(--text); font-weight: 500; }
-.loading-step.done { color: var(--green); }
-.step-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--border);
-  flex-shrink: 0;
-  transition: background .3s;
-}
-.loading-step.active .step-dot { background: var(--blue); animation: pulse-dot 1s infinite; }
-.loading-step.done .step-dot { background: var(--green); }
-@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+/* MAIN */
+.main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;}
 
-/* ── STORYBOARD OVERLAY ── */
-.storyboard-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,20,50,.6);
-  backdrop-filter: blur(5px);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: fadeIn .25s ease;
-}
-.storyboard-overlay.visible { display: flex; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+/* PANELS */
+.panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);width:100%;max-width:480px;}
+.panel-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);}
+.panel-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.panel-sub{font-size:12.5px;color:var(--text-m);line-height:1.5;}
+.panel-body{padding:18px 20px;}
+.panel-footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--bg);border-radius:0 0 var(--radius) var(--radius);}
 
-.storyboard-modal {
-  background: var(--surface);
-  border-radius: 14px;
-  width: 100%;
-  max-width: 760px;
-  max-height: calc(100vh - 40px);
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-l);
-  animation: slideUp .3s ease;
-  overflow: hidden;
-}
-@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+/* FORM */
+.field{margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+.label{font-size:10.5px;font-weight:600;color:var(--text-l);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;display:block;}
+.input{width:100%;border:1.5px solid var(--border-m);border-radius:var(--radius-s);padding:8px 11px;font-family:inherit;font-size:13px;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s,background .15s;}
+.input:focus{border-color:var(--blue);background:var(--surface);}
+.input::placeholder{color:var(--text-l);}
+.input-hint{font-size:10.5px;color:var(--text-l);margin-top:4px;line-height:1.4;}
+.input[readonly]{background:var(--bg);color:var(--text-m);cursor:default;}
 
-.story-header {
-  background: var(--navy);
-  padding: 16px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-.story-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.story-header-logo {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-}
-.story-meta {
-  font-size: 11px;
-  color: rgba(255,255,255,.6);
-  margin-top: 2px;
-}
-.story-header-right { display: flex; gap: 8px; align-items: center; }
-.hdr-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.1);
-  color: #fff;
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background .15s;
-}
-.hdr-btn:hover { background: rgba(255,255,255,.2); }
-.hdr-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.1);
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 4px;
-}
-.hdr-close:hover { background: rgba(255,255,255,.25); }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:var(--radius-s);border:1px solid var(--border);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;background:var(--surface);color:var(--text-m);}
+.btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l);}
+.btn:disabled{background:var(--border);color:var(--text-l);cursor:default;border-color:var(--border);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-d);color:#fff;border-color:var(--blue-d);}
+.btn-primary:disabled{background:var(--border-m);border-color:var(--border-m);color:var(--text-l);}
+.btn-full{width:100%;}
+.btn-sm{padding:6px 12px;font-size:12px;}
 
-.story-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 32px 36px;
-  scroll-behavior: smooth;
-}
-.story-body::-webkit-scrollbar { width: 5px; }
-.story-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* STEPS */
+.steps{display:flex;gap:0;margin-bottom:20px;}
+.step{flex:1;text-align:center;position:relative;}
+.step::after{content:'';position:absolute;top:13px;left:50%;width:100%;height:1.5px;background:var(--border);}
+.step:last-child::after{display:none;}
+.step-dot{width:26px;height:26px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-l);margin:0 auto 5px;position:relative;z-index:1;}
+.step.active .step-dot{background:var(--blue);border-color:var(--blue);color:#fff;}
+.step.done .step-dot{background:var(--green);border-color:var(--green);color:#fff;}
+.step-label{font-size:10px;color:var(--text-l);}
+.step.active .step-label{color:var(--blue);font-weight:500;}
+.step.done .step-label{color:var(--green);}
 
-/* ── STORYBOARD CONTENT STYLES ── */
-.story-filters {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-.filter-tag {
-  background: var(--blue-l);
-  color: #185FA5;
-  border: 1px solid var(--blue-m);
-  border-radius: 20px;
-  padding: 3px 10px;
-  font-size: 11.5px;
-  font-weight: 500;
-}
+/* DASHBOARD LIST */
+.dash-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+.dash-list::-webkit-scrollbar{width:3px;}
+.dash-list::-webkit-scrollbar-thumb{background:var(--border-m);border-radius:2px;}
+.dash-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-s);cursor:pointer;transition:all .15s;background:var(--surface);}
+.dash-item:hover{border-color:var(--blue);background:var(--blue-l);}
+.dash-item.selected{border-color:var(--blue);background:var(--blue-l);}
+.dash-icon{font-size:16px;flex-shrink:0;}
+.dash-info{flex:1;min-width:0;}
+.dash-name{font-size:12.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-meta{font-size:10.5px;color:var(--text-l);margin-top:1px;}
 
-.story-headline {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-  margin-bottom: 10px;
-  letter-spacing: -.01em;
-}
-.story-standfirst {
-  font-size: 15px;
-  color: var(--text-m);
-  line-height: 1.65;
-  margin-bottom: 28px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-}
+/* LOADING */
+.loading-wrap{text-align:center;padding:20px 0;}
+.spinner{width:36px;height:36px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-steps{display:flex;flex-direction:column;gap:7px;margin-top:14px;text-align:left;}
+.lstep{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-l);}
+.lstep.active{color:var(--text);font-weight:500;}
+.lstep.done{color:var(--green);}
+.lstep-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.lstep.active .lstep-dot{background:var(--blue);animation:pulse-d 1s infinite;}
+.lstep.done .lstep-dot{background:var(--green);}
+@keyframes pulse-d{0%,100%{opacity:1}50%{opacity:.3}}
 
-.story-section {
-  margin-bottom: 28px;
-}
-.story-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text-l);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.story-section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
+/* ERROR / SUCCESS */
+.alert{padding:10px 12px;border-radius:var(--radius-s);font-size:12.5px;line-height:1.55;margin-top:10px;}
+.alert-error{background:var(--red-l);border:1px solid #F5B8BB;color:var(--red);}
+.alert-success{background:var(--green-l);border:1px solid var(--green-m);color:var(--green);}
+.alert-info{background:var(--blue-l);border:1px solid var(--blue-m);color:#185FA5;}
+.hidden{display:none;}
 
-.story-text {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.75;
-}
-.story-text p { margin-bottom: 10px; }
-.story-text p:last-child { margin-bottom: 0; }
-.story-text strong { color: var(--text); font-weight: 600; }
-.story-text em { color: var(--text-m); font-style: italic; }
+/* TRUST NOTE */
+.trust{display:flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;color:var(--text-l);margin-top:10px;}
 
-.finding-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.finding-card {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--text);
-}
-.finding-card.critical { border-left: 3px solid var(--red); }
-.finding-card.warning { border-left: 3px solid var(--amber); }
-.finding-card.positive { border-left: 3px solid var(--green); }
-.finding-card.neutral { border-left: 3px solid var(--blue); }
-.finding-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+/* ── STORYBOARD ── */
+.story-wrap{width:100%;max-width:720px;}
+.story-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.story-nav{background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.story-nav-left{display:flex;align-items:center;gap:8px;}
+.story-nav-logo{display:flex;align-items:center;gap:6px;color:#fff;font-size:13px;font-weight:600;}
+.story-nav-meta{font-size:10.5px;color:rgba(255,255,255,.55);margin-top:2px;}
+.story-nav-right{display:flex;gap:7px;}
+.nav-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:5px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-family:inherit;font-size:12px;cursor:pointer;transition:background .15s;}
+.nav-btn:hover{background:rgba(255,255,255,.2);}
+.story-body{padding:28px 32px;overflow-y:auto;max-height:calc(100vh - 160px);}
+.story-body::-webkit-scrollbar{width:4px;}
+.story-body::-webkit-scrollbar-thumb{background:var(--border-m);}
 
-.qa-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.qa-item {
-  padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-}
-.qa-q {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 5px;
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-}
-.qa-q-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--blue-l);
-  color: var(--blue);
-  font-size: 10px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.qa-a {
-  font-size: 13px;
-  color: var(--text-m);
-  line-height: 1.6;
-  padding-left: 25px;
-}
+.story-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+.filter-tag{background:var(--blue-l);color:#185FA5;border:1px solid var(--blue-m);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:500;}
 
-.watch-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.watch-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13.5px;
-  color: var(--text);
-  line-height: 1.6;
-  padding: 10px 12px;
-  border: 1px solid var(--amber-l);
-  border-left: 3px solid var(--amber);
-  border-radius: 7px;
-  background: var(--amber-l);
-}
+.story-headline{font-size:22px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:9px;letter-spacing:-.01em;}
+.story-standfirst{font-size:14.5px;color:var(--text-m);line-height:1.7;margin-bottom:24px;padding-bottom:22px;border-bottom:1px solid var(--border);}
 
-.story-footer {
-  padding: 14px 22px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  background: var(--bg);
-}
-.footer-left { font-size: 11.5px; color: var(--text-l); display: flex; align-items: center; gap: 5px; }
-.footer-right { display: flex; gap: 8px; }
-.foot-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-m);
-  font-family: inherit;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.foot-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
-.foot-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
-.foot-btn.primary:hover { background: #0d66d0; }
+.story-section{margin-bottom:24px;}
+.section-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-l);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* ── ERROR STATE ── */
-.error-card {
-  display: none;
-  background: var(--red-l);
-  border: 1px solid #F5B8BB;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin-top: 12px;
-  font-size: 12.5px;
-  color: var(--red);
-  line-height: 1.55;
-}
-.error-card.visible { display: block; }
+.finding-list{display:flex;flex-direction:column;gap:8px;}
+.finding{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border:1px solid var(--border);border-radius:7px;background:var(--bg);font-size:13px;line-height:1.6;color:var(--text);}
+.finding.critical{border-left:3px solid var(--red);}
+.finding.warning{border-left:3px solid var(--amber);}
+.finding.positive{border-left:3px solid var(--green);}
+.finding.neutral{border-left:3px solid var(--blue);}
+.finding-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
 
-/* ── PRINT ── */
-@media print {
-  .storyboard-overlay { position: static; background: none; padding: 0; display: block; }
-  .storyboard-modal { max-height: none; box-shadow: none; border-radius: 0; }
-  .story-header, .story-footer { display: none; }
-  .story-body { overflow: visible; padding: 20px; }
-}
+.so-what{font-size:13.5px;color:var(--text);line-height:1.75;}
+
+.qa-list{display:flex;flex-direction:column;gap:8px;}
+.qa-item{padding:11px 13px;border:1px solid var(--border);border-radius:7px;background:var(--surface);}
+.qa-q{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:flex-start;gap:7px;}
+.qa-badge{width:17px;height:17px;border-radius:50%;background:var(--blue-l);color:var(--blue);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.qa-a{font-size:12.5px;color:var(--text-m);line-height:1.6;padding-left:24px;}
+
+.watch-list{display:flex;flex-direction:column;gap:7px;}
+.watch-item{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--text);line-height:1.6;padding:9px 11px;border:1px solid var(--amber-m);border-left:3px solid var(--amber);border-radius:6px;background:var(--amber-l);}
+
+.story-footer{padding:12px 20px;border-top:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;}
+.footer-note{font-size:11px;color:var(--text-l);display:flex;align-items:center;gap:5px;}
+.footer-actions{display:flex;gap:7px;}
 </style>
 </head>
 <body>
 
-<!-- ── LAUNCH PANEL ── -->
-<div class="launch-panel" id="launch-panel">
-  <div class="launch-logo">
+<nav class="nav">
+  <div class="nav-logo">
     <svg viewBox="0 0 24 24" fill="none">
       <rect x="11" y="1.5" width="2" height="5.5" fill="#E86427" rx="1"/>
       <rect x="11" y="17" width="2" height="5.5" fill="#E86427" rx="1" opacity=".4"/>
       <rect x="1.5" y="11" width="5.5" height="2" fill="#E86427" rx="1"/>
       <rect x="17" y="11" width="5.5" height="2" fill="#E86427" rx="1" opacity=".4"/>
       <rect x="4.2" y="3.5" width="2" height="5.5" fill="#E86427" rx="1" transform="rotate(45 4.2 3.5)"/>
-      <rect x="15.5" y="14.8" width="2" height="5.5" fill="#E86427" rx="1" transform="rotate(45 15.5 14.8)" opacity=".4"/>
-      <rect x="3.5" y="15.5" width="5.5" height="2" fill="#E86427" rx="1" transform="rotate(45 3.5 15.5)" opacity=".4"/>
       <rect x="14.8" y="4.2" width="5.5" height="2" fill="#E86427" rx="1" transform="rotate(45 14.8 4.2)"/>
     </svg>
-    <span class="launch-logo-text">Tableau Storyboard</span>
+    Tableau Storyboard
   </div>
+</nav>
 
-  <div class="launch-title">Turn this dashboard into a story</div>
-  <div class="launch-sub">One click transforms your dashboard data into a plain&#8209;English narrative — built for people who want to understand, not just explore.</div>
+<div class="main" id="main">
 
-  <div class="launch-features">
-    <div class="feature-row">
-      <div class="feature-icon" style="background:#EAF3FE">&#128214;</div>
-      <span>Reads all worksheet data & active filters</span>
+  <!-- STEP 1: CONNECT -->
+  <div class="panel" id="panel-connect">
+    <div class="panel-hdr">
+      <div class="panel-title">&#128214; Connect to Tableau</div>
+      <div class="panel-sub">Enter your Tableau credentials to fetch dashboard data and generate a storyboard narrative.</div>
     </div>
-    <div class="feature-row">
-      <div class="feature-icon" style="background:#E8F7F2">&#129504;</div>
-      <span>Generates causal narrative — not just metrics</span>
-    </div>
-    <div class="feature-row">
-      <div class="feature-icon" style="background:#FEF5E7">&#10067;</div>
-      <span>Answers the questions consumers don&#39;t know to ask</span>
-    </div>
-    <div class="feature-row">
-      <div class="feature-icon" style="background:#F3EFFE">&#128228;</div>
-      <span>Export to PDF or copy to share anywhere</span>
-    </div>
-  </div>
+    <div class="panel-body">
+      <div class="steps" id="steps">
+        <div class="step active" id="s1"><div class="step-dot">1</div><div class="step-label">Connect</div></div>
+        <div class="step" id="s2"><div class="step-dot">2</div><div class="step-label">Pick dashboard</div></div>
+        <div class="step" id="s3"><div class="step-dot">3</div><div class="step-label">Generate</div></div>
+        <div class="step" id="s4"><div class="step-dot">4</div><div class="step-label">Read story</div></div>
+      </div>
 
-  <div class="api-section">
-    <div class="api-label">Anthropic API Key</div>
-    <input
-      type="password"
-      class="api-input"
-      id="api-key-input"
-      placeholder="sk-ant-api03-..."
-      autocomplete="off"
-      spellcheck="false"
-    />
-    <div class="api-hint">Your key is used only in this browser session and never stored or sent anywhere except Anthropic&#39;s API.</div>
-  </div>
+      <div class="field">
+        <label class="label">Tableau Server URL</label>
+        <input class="input" id="server-url" type="text" value="https://us-west-2b.online.tableau.com" placeholder="https://your-server.tableau.com" />
+      </div>
+      <div class="field">
+        <label class="label">Site Name</label>
+        <input class="input" id="site-name" type="text" value="viksdemosite" placeholder="your-site-name" />
+        <div class="input-hint">The site ID in your Tableau URL. Leave blank for the default site.</div>
+      </div>
+      <div class="field">
+        <label class="label">Personal Access Token Name</label>
+        <input class="input" id="pat-name" type="text" placeholder="MyTokenName" autocomplete="off" />
+        <div class="input-hint">Create one in Tableau Cloud: Account menu &#8594; My Account Settings &#8594; Personal Access Tokens.</div>
+      </div>
+      <div class="field">
+        <label class="label">Personal Access Token Secret</label>
+        <input class="input" id="pat-secret" type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="label">Anthropic API Key</label>
+        <input class="input" id="claude-key" type="password" placeholder="sk-ant-api03-..." autocomplete="off" />
+        <div class="input-hint">Get one at console.anthropic.com. Used only in this browser session.</div>
+      </div>
 
-  <div class="error-card" id="error-card"></div>
-<button class="generate-btn" id="retry-init-btn" style="display:none;background:#5A6070;margin-top:8px;font-size:13px">
-  &#8635; Retry Connection
-</button>
+      <div id="connect-error" class="alert alert-error hidden"></div>
 
-  <button class="generate-btn" id="generate-btn">
-    <span>&#128214;</span>
-    <span id="btn-label">Generate Story</span>
-  </button>
-
-  <div class="trust-note">
-    <span>&#128737;</span>
-    <span>Reads data under your Tableau session permissions</span>
-  </div>
-</div>
-
-<!-- ── LOADING OVERLAY ── -->
-<div class="loading-overlay" id="loading-overlay">
-  <div class="loading-card">
-    <div class="loading-spinner"></div>
-    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">Generating your story</div>
-    <div style="font-size:12.5px;color:var(--text-m);margin-bottom:16px">This takes about 15&#8211;20 seconds</div>
-    <div class="loading-steps">
-      <div class="loading-step" id="step-1"><div class="step-dot"></div>Connecting to Tableau Extensions API</div>
-      <div class="loading-step" id="step-2"><div class="step-dot"></div>Reading dashboard worksheets &amp; filters</div>
-      <div class="loading-step" id="step-3"><div class="step-dot"></div>Extracting data from all worksheets</div>
-      <div class="loading-step" id="step-4"><div class="step-dot"></div>Sending to Claude for narrative generation</div>
-      <div class="loading-step" id="step-5"><div class="step-dot"></div>Building your storyboard</div>
+      <button class="btn btn-primary btn-full" id="connect-btn" style="margin-top:16px">
+        Connect to Tableau &#8594;
+      </button>
+      <div class="trust">&#128737; Your credentials stay in this browser tab and are never stored</div>
     </div>
   </div>
-</div>
 
-<!-- ── STORYBOARD OVERLAY ── -->
-<div class="storyboard-overlay" id="storyboard-overlay">
-  <div class="storyboard-modal" id="storyboard-modal">
-    <div class="story-header">
-      <div class="story-header-left">
-        <div class="story-header-logo">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect x="11" y="1.5" width="2" height="5.5" fill="#E86427" rx="1"/>
-            <rect x="11" y="17" width="2" height="5.5" fill="#E86427" rx="1" opacity=".4"/>
-            <rect x="1.5" y="11" width="5.5" height="2" fill="#E86427" rx="1"/>
-            <rect x="17" y="11" width="5.5" height="2" fill="#E86427" rx="1" opacity=".4"/>
-          </svg>
-          Dashboard Story
+  <!-- STEP 2: PICK DASHBOARD -->
+  <div class="panel hidden" id="panel-pick">
+    <div class="panel-hdr">
+      <div class="panel-title">&#128202; Pick a dashboard</div>
+      <div class="panel-sub">Select the dashboard you want to turn into a storyboard.</div>
+    </div>
+    <div class="panel-body">
+      <div class="steps">
+        <div class="step done"><div class="step-dot">&#10003;</div><div class="step-label">Connect</div></div>
+        <div class="step active"><div class="step-dot">2</div><div class="step-label">Pick dashboard</div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-label">Generate</div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-label">Read story</div></div>
+      </div>
+      <div id="dash-loading" class="loading-wrap">
+        <div class="spinner"></div>
+        <div style="font-size:12.5px;color:var(--text-m)">Loading your dashboards&#8230;</div>
+      </div>
+      <div id="dash-list-wrap" class="hidden">
+        <div class="dash-list" id="dash-list"></div>
+        <div id="pick-error" class="alert alert-error hidden" style="margin-top:10px"></div>
+        <button class="btn btn-primary btn-full hidden" id="generate-btn" style="margin-top:14px">
+          &#129504; Generate Story &#8594;
+        </button>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-sm" id="back-btn">&#8592; Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: GENERATING -->
+  <div class="panel hidden" id="panel-generating">
+    <div class="panel-hdr">
+      <div class="panel-title">&#129504; Generating your story</div>
+      <div class="panel-sub">Reading the dashboard data and crafting the narrative&#8230;</div>
+    </div>
+    <div class="panel-body">
+      <div class="steps">
+        <div class="step done"><div class="step-dot">&#10003;</div><div class="step-label">Connect</div></div>
+        <div class="step done"><div class="step-dot">&#10003;</div><div class="step-label">Pick dashboard</div></div>
+        <div class="step active"><div class="step-dot">3</div><div class="step-label">Generate</div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-label">Read story</div></div>
+      </div>
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div style="font-size:13px;font-weight:500;color:var(--text)">Building your storyboard</div>
+        <div style="font-size:12px;color:var(--text-m);margin-top:3px">Takes about 20&#8211;30 seconds</div>
+        <div class="loading-steps" id="gen-steps">
+          <div class="lstep" id="gs1"><div class="lstep-dot"></div>Fetching dashboard views</div>
+          <div class="lstep" id="gs2"><div class="lstep-dot"></div>Downloading dashboard data</div>
+          <div class="lstep" id="gs3"><div class="lstep-dot"></div>Sending to Claude for analysis</div>
+          <div class="lstep" id="gs4"><div class="lstep-dot"></div>Building narrative structure</div>
+          <div class="lstep" id="gs5"><div class="lstep-dot"></div>Rendering storyboard</div>
         </div>
-        <div class="story-meta" id="story-meta">Generated just now</div>
       </div>
-      <div class="story-header-right">
-        <button class="hdr-btn" id="copy-btn">&#128203; Copy text</button>
-        <button class="hdr-btn" id="print-btn">&#128196; Export PDF</button>
-        <button class="hdr-close" id="close-btn" title="Close">&#10005;</button>
-      </div>
+      <div id="gen-error" class="alert alert-error hidden" style="margin-top:10px"></div>
     </div>
+  </div>
 
-    <div class="story-body" id="story-body">
-      <!-- populated by JS -->
-    </div>
+</div>
 
-    <div class="story-footer">
-      <div class="footer-left">
-        <span>&#128737;</span>
-        <span>Generated from your live dashboard data &middot; <span id="footer-time"></span></span>
-      </div>
-      <div class="footer-right">
-        <button class="foot-btn" id="regenerate-btn">&#8635; Regenerate</button>
-        <button class="foot-btn primary" id="close-btn-2">Done</button>
+<!-- STORYBOARD (full page) -->
+<div id="story-page" class="hidden" style="flex:1;display:flex;flex-direction:column;">
+  <div style="flex:1;overflow-y:auto;padding:20px 16px;background:var(--bg);">
+    <div style="max-width:720px;margin:0 auto;">
+      <div class="story-card">
+        <div class="story-nav">
+          <div class="story-nav-left">
+            <div class="story-nav-logo">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="11" y="1.5" width="2" height="5.5" fill="#E86427" rx="1"/>
+                <rect x="11" y="17" width="2" height="5.5" fill="#E86427" rx="1" opacity=".4"/>
+                <rect x="1.5" y="11" width="5.5" height="2" fill="#E86427" rx="1"/>
+                <rect x="17" y="11" width="5.5" height="2" fill="#E86427" rx="1" opacity=".4"/>
+              </svg>
+              Dashboard Story
+            </div>
+            <div class="story-nav-meta" id="story-meta"></div>
+          </div>
+          <div class="story-nav-right">
+            <button class="nav-btn" id="copy-btn">&#128203; Copy</button>
+            <button class="nav-btn" id="print-btn">&#128196; PDF</button>
+            <button class="nav-btn" id="new-story-btn">&#8592; New story</button>
+          </div>
+        </div>
+        <div class="story-body" id="story-body"></div>
+        <div class="story-footer">
+          <div class="footer-note">&#128737; Generated from live Tableau data &#183; <span id="footer-time"></span></div>
+          <div class="footer-actions">
+            <button class="btn btn-sm" id="regen-btn">&#8635; Regenerate</button>
+            <button class="btn btn-sm btn-primary" id="done-btn">Done</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -650,314 +318,307 @@ body {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-  // ── CONFIG ──
-  const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
-  const MAX_ROWS_PER_SHEET = 200; // cap to avoid huge prompts
-
   // ── STATE ──
-  let dashboardData = null;
-  let storyText = '';
-  let tableau = null;
+  let authToken = null;
+  let siteId = null;
+  let selectedView = null;
+  let storyData = null;
+  const PROXY = 'https://corsproxy.io/?'; // CORS proxy for Tableau REST API
 
-  // ── ELEMENTS ──
-  const generateBtn = document.getElementById('generate-btn');
-  const btnLabel = document.getElementById('btn-label');
-  const apiKeyInput = document.getElementById('api-key-input');
-  const errorCard = document.getElementById('error-card');
-  const loadingOverlay = document.getElementById('loading-overlay');
-  const storyboardOverlay = document.getElementById('storyboard-overlay');
-  const storyBody = document.getElementById('story-body');
-  const storyMeta = document.getElementById('story-meta');
-  const footerTime = document.getElementById('footer-time');
+  // ── HELPERS ──
+  function el(id) { return document.getElementById(id); }
+  function show(id) { el(id).classList.remove('hidden'); }
+  function hide(id) { el(id).classList.add('hidden'); }
+  function showErr(id, msg) { const e = el(id); e.textContent = msg; e.classList.remove('hidden'); }
+  function hideErr(id) { el(id).classList.add('hidden'); }
+  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  // ── INIT TABLEAU EXTENSIONS API ──
-  // Initialize Tableau Extensions API with retry logic
-  let tableauInitialized = false;
-  let initAttempts = 0;
-  const MAX_ATTEMPTS = 10;
+  function esc(s) {
+    if (typeof s !== 'string') return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
 
-  function tryInit() {
-    initAttempts++;
-    console.log('Tableau init attempt', initAttempts, 
-      '| tableau:', typeof window.tableau,
-      '| extensions:', typeof window.tableau !== 'undefined' ? typeof window.tableau.extensions : 'n/a'
-    );
-
-    if (typeof window.tableau !== 'undefined' && 
-        window.tableau.extensions && 
-        typeof window.tableau.extensions.initializeAsync === 'function') {
-      
-      window.tableau.extensions.initializeAsync().then(function() {
-        console.log('Tableau Extensions API ready');
-        tableauInitialized = true;
-        hideError();
-        try {
-          const savedKey = window.tableau.extensions.settings.get('anthropic_api_key');
-          if (savedKey) apiKeyInput.value = savedKey;
-        } catch(e) { /* ok */ }
-      }).catch(function(err) {
-        console.warn('initializeAsync error:', err);
-        showError('Tableau init error: ' + (err.message || err));
-      });
-
-    } else if (initAttempts < MAX_ATTEMPTS) {
-      setTimeout(tryInit, 800);
-    } else {
-      // Tableau object not injected - this usually means the .trex URL 
-      // doesn't match the GitHub Pages URL exactly, or the extension 
-      // needs to be reloaded inside Tableau
-      console.error('window.tableau state:', typeof window.tableau);
-      showError('Tableau not detected after ' + MAX_ATTEMPTS + ' attempts. ' +
-        'Try: right-click the extension panel in Tableau and click Reload. ' +
-        'Also verify the URL in storyboard.trex matches exactly: ' +
-        'https://vbandarupalli-oss.github.io/tableau-storyboard/');
+  function setGenStep(n) {
+    for (let i = 1; i <= 5; i++) {
+      const e = el('gs' + i);
+      if (!e) continue;
+      e.className = 'lstep' + (i < n ? ' done' : i === n ? ' active' : '');
     }
   }
 
-  tryInit();
-
-  // Retry button
-  const retryBtn = document.getElementById('retry-init-btn');
-  if (retryBtn) {
-    retryBtn.addEventListener('click', function() {
-      initAttempts = 0;
-      tableauInitialized = false;
-      hideError();
-      retryBtn.style.display = 'none';
-      tryInit();
-    });
+  // ── TABLEAU REST API ──
+  function tableauUrl(path) {
+    const base = el('server-url').value.trim().replace(/\/$/, '');
+    return PROXY + encodeURIComponent(base + '/api/3.21' + path);
   }
 
-  // Show retry button after errors
-  const origShowError = showError;
-  showError = function(msg) {
-    origShowError(msg);
-    if (retryBtn) retryBtn.style.display = 'flex';
-  };
-  const origHideError = hideError;
-  hideError = function() {
-    origHideError();
-    if (retryBtn) retryBtn.style.display = 'none';
-  };
+  async function tableauFetch(path, options = {}) {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...(options.headers || {})
+    };
+    if (authToken) headers['X-Tableau-Auth'] = authToken;
 
-  function configure() {
-    // Settings dialog — for now just use inline API key input
+    const resp = await fetch(tableauUrl(path), {
+      method: options.method || 'GET',
+      headers,
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
+
+    if (!resp.ok) {
+      let errMsg = 'HTTP ' + resp.status;
+      try {
+        const errData = await resp.json();
+        errMsg = errData.error?.detail || errData.error?.summary || errMsg;
+      } catch(e) {}
+      throw new Error(errMsg);
+    }
+    return resp.json();
+  }
+
+  // Sign in with PAT
+  async function signIn() {
+    const siteName = el('site-name').value.trim();
+    const patName = el('pat-name').value.trim();
+    const patSecret = el('pat-secret').value.trim();
+
+    const body = {
+      credentials: {
+        personalAccessTokenName: patName,
+        personalAccessTokenSecret: patSecret,
+        site: { contentUrl: siteName }
+      }
+    };
+
+    const data = await tableauFetch('/auth/signin', { method: 'POST', body });
+    authToken = data.credentials.token;
+    siteId = data.credentials.site.id;
+    return data;
+  }
+
+  // Get all views (dashboards) for the site
+  async function getViews() {
+    const data = await tableauFetch('/sites/' + siteId + '/views?pageSize=100&includeUsageStatistics=false');
+    return data.views?.view || [];
+  }
+
+  // Get data for a specific view using CSV download
+  async function getViewData(viewId) {
+    const base = el('server-url').value.trim().replace(/\/$/, '');
+    const url = PROXY + encodeURIComponent(
+      base + '/api/3.21/sites/' + siteId + '/views/' + viewId + '/data'
+    );
+    const resp = await fetch(url, {
+      headers: { 'X-Tableau-Auth': authToken, 'Accept': 'text/csv' }
+    });
+    if (!resp.ok) throw new Error('Could not fetch view data: HTTP ' + resp.status);
+    return resp.text();
+  }
+
+  // Get view image
+  async function getViewImage(viewId) {
+    const base = el('server-url').value.trim().replace(/\/$/, '');
+    const url = PROXY + encodeURIComponent(
+      base + '/api/3.21/sites/' + siteId + '/views/' + viewId + '/image?resolution=high'
+    );
+    const resp = await fetch(url, {
+      headers: { 'X-Tableau-Auth': authToken }
+    });
+    if (!resp.ok) return null;
+    const blob = await resp.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  // Parse CSV to summary
+  function parseCSV(csv) {
+    const lines = csv.trim().split('\n');
+    if (lines.length < 2) return { headers: [], rows: [], summary: 'No data' };
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows = lines.slice(1, 51).map(line => {
+      const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = vals[i] || ''; });
+      return obj;
+    });
+    return { headers, rows, totalRows: lines.length - 1 };
+  }
+
+  // ── CONNECT BUTTON ──
+  el('connect-btn').addEventListener('click', async function() {
+    hideErr('connect-error');
+    const btn = el('connect-btn');
+    const patName = el('pat-name').value.trim();
+    const patSecret = el('pat-secret').value.trim();
+    const claudeKey = el('claude-key').value.trim();
+
+    if (!patName) { showErr('connect-error', 'Please enter your Personal Access Token name.'); return; }
+    if (!patSecret) { showErr('connect-error', 'Please enter your Personal Access Token secret.'); return; }
+    if (!claudeKey) { showErr('connect-error', 'Please enter your Anthropic API key.'); return; }
+    if (!claudeKey.startsWith('sk-ant-')) { showErr('connect-error', 'Anthropic API key should start with sk-ant-'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Connecting...';
+
+    try {
+      await signIn();
+      // Move to step 2
+      hide('panel-connect');
+      show('panel-pick');
+      loadDashboards();
+    } catch(err) {
+      showErr('connect-error', 'Connection failed: ' + err.message + '. Check your server URL and token.');
+      btn.disabled = false;
+      btn.innerHTML = 'Connect to Tableau &#8594;';
+    }
+  });
+
+  // ── LOAD DASHBOARDS ──
+  async function loadDashboards() {
+    el('dash-loading').style.display = 'block';
+    hide('dash-list-wrap');
+
+    try {
+      const views = await getViews();
+      el('dash-loading').style.display = 'none';
+      show('dash-list-wrap');
+
+      if (views.length === 0) {
+        showErr('pick-error', 'No views found on this site. Make sure your token has access to content.');
+        return;
+      }
+
+      const list = el('dash-list');
+      list.innerHTML = '';
+      views.forEach(function(view) {
+        const item = document.createElement('div');
+        item.className = 'dash-item';
+        item.dataset.id = view.id;
+        item.dataset.name = view.name;
+        item.dataset.wb = view.owner?.name || '';
+        item.innerHTML =
+          '<div class="dash-icon">&#128202;</div>' +
+          '<div class="dash-info">' +
+            '<div class="dash-name">' + esc(view.name) + '</div>' +
+            '<div class="dash-meta">' + esc(view.owner?.name || '') + (view.viewUrlName ? ' &#183; ' + esc(view.viewUrlName) : '') + '</div>' +
+          '</div>';
+        item.addEventListener('click', function() {
+          document.querySelectorAll('.dash-item').forEach(function(i) { i.classList.remove('selected'); });
+          item.classList.add('selected');
+          selectedView = { id: view.id, name: view.name };
+          show('generate-btn');
+          hideErr('pick-error');
+        });
+        list.appendChild(item);
+      });
+
+    } catch(err) {
+      el('dash-loading').style.display = 'none';
+      show('dash-list-wrap');
+      showErr('pick-error', 'Could not load dashboards: ' + err.message);
+    }
   }
 
   // ── GENERATE BUTTON ──
-  generateBtn.addEventListener('click', async function() {
-    const apiKey = apiKeyInput.value.trim();
-    if (!apiKey) {
-      showError('Please enter your Anthropic API key to generate a story.');
-      return;
-    }
-    if (!apiKey.startsWith('sk-ant-')) {
-      showError('That doesn\'t look like a valid Anthropic API key. It should start with sk-ant-');
-      return;
-    }
-    hideError();
-    await generateStory(apiKey);
+  el('generate-btn').addEventListener('click', async function() {
+    if (!selectedView) return;
+    hide('panel-pick');
+    show('panel-generating');
+    hideErr('gen-error');
+    await generateStory();
   });
 
-  // ── MAIN FLOW ──
-  async function generateStory(apiKey) {
-    // Check Tableau is initialized before proceeding
-    if (!tableauInitialized) {
-      showError('Tableau Extensions API is not ready yet. Please wait a moment and try again.');
-      return;
-    }
-    showLoading();
+  el('back-btn').addEventListener('click', function() {
+    hide('panel-pick');
+    show('panel-connect');
+    selectedView = null;
+  });
+
+  // ── GENERATE STORY ──
+  async function generateStory() {
+    const claudeKey = el('claude-key').value.trim();
+
     try {
-      // Step 1: Connect
-      setLoadingStep(1);
-      await delay(400);
-
-      // Step 2: Read dashboard metadata
-      setLoadingStep(2);
-      const dashboard = window.tableau.extensions.dashboardContent.dashboard;
-      const dashboardName = dashboard.name;
-      const worksheets = dashboard.worksheets;
-
-      // Collect filter info
-      let allFilters = [];
-      for (const ws of worksheets) {
-        try {
-          const filters = await ws.getFiltersAsync();
-          for (const f of filters) {
-            if (f.filterType === 'categorical') {
-              const vals = f.appliedValues.map(v => v.formattedValue).slice(0, 10);
-              if (vals.length > 0 && vals.length < f.appliedValues.length + 1) {
-                allFilters.push({ field: f.fieldName, values: vals });
-              }
-            } else if (f.filterType === 'range') {
-              allFilters.push({ field: f.fieldName, min: f.minValue, max: f.maxValue });
-            }
-          }
-        } catch(e) { /* skip filter errors */ }
-      }
-      // Deduplicate filters
-      const filterMap = {};
-      allFilters.forEach(f => { filterMap[f.field] = f; });
-      allFilters = Object.values(filterMap);
-
-      await delay(400);
-
-      // Step 3: Extract data from worksheets
-      setLoadingStep(3);
-      const worksheetData = [];
-
-      for (const ws of worksheets) {
-        try {
-          const dataTable = await ws.getSummaryDataAsync({ maxRows: MAX_ROWS_PER_SHEET });
-          const columns = dataTable.columns.map(c => ({
-            name: c.fieldName,
-            dataType: c.dataType,
-            isNumber: c.dataType === 'float' || c.dataType === 'int'
-          }));
-
-          // Convert rows to objects
-          const rows = dataTable.data.slice(0, MAX_ROWS_PER_SHEET).map(row => {
-            const obj = {};
-            columns.forEach((col, i) => {
-              obj[col.name] = row[i].formattedValue;
-            });
-            return obj;
-          });
-
-          // Compute basic stats for numeric columns
-          const stats = {};
-          columns.filter(c => c.isNumber).forEach(col => {
-            const vals = dataTable.data
-              .map(r => parseFloat(r[columns.indexOf(col)].value))
-              .filter(v => !isNaN(v));
-            if (vals.length > 0) {
-              stats[col.name] = {
-                min: Math.min(...vals).toFixed(2),
-                max: Math.max(...vals).toFixed(2),
-                sum: vals.reduce((a,b) => a+b, 0).toFixed(2),
-                avg: (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2),
-                count: vals.length
-              };
-            }
-          });
-
-          worksheetData.push({
-            name: ws.name,
-            columns: columns.map(c => c.name),
-            rowCount: dataTable.data.length,
-            sampleRows: rows.slice(0, 50),
-            stats
-          });
-        } catch(e) {
-          console.warn(`Could not read worksheet ${ws.name}:`, e);
-        }
+      // Step 1: Get view data
+      setGenStep(1);
+      await delay(300);
+      let csvData = '';
+      try {
+        csvData = await getViewData(selectedView.id);
+      } catch(e) {
+        csvData = '(Data unavailable - ' + e.message + ')';
       }
 
+      setGenStep(2);
       await delay(300);
+      const parsed = parseCSV(csvData);
 
-      // Step 4: Call Claude
-      setLoadingStep(4);
+      // Step 3: Call Claude
+      setGenStep(3);
+      const prompt = buildPrompt(selectedView.name, parsed);
+      const narrative = await callClaude(claudeKey, prompt);
 
-      const prompt = buildPrompt(dashboardName, allFilters, worksheetData);
-      const narrative = await callClaude(apiKey, prompt);
-
-      await delay(300);
+      setGenStep(4);
+      await delay(400);
 
       // Step 5: Render
-      setLoadingStep(5);
-      storyText = narrative;
+      setGenStep(5);
+      storyData = narrative;
+      await delay(300);
 
-      // Save API key in settings for convenience
-      try {
-        window.tableau.extensions.settings.set('anthropic_api_key', apiKey);
-        await window.tableau.extensions.settings.saveAsync();
-      } catch(e) { /* non-critical */ }
-
-      await delay(500);
-      hideLoading();
-      renderStoryboard(dashboardName, allFilters, narrative);
+      hide('panel-generating');
+      renderStory(selectedView.name, narrative);
 
     } catch(err) {
-      hideLoading();
-      console.error('Story generation failed:', err);
-      showError('Something went wrong: ' + (err.message || 'Unknown error. Check the browser console for details.'));
+      showErr('gen-error', 'Generation failed: ' + err.message);
     }
   }
 
-  // ── PROMPT BUILDER ──
-  function buildPrompt(dashboardName, filters, worksheetData) {
-    const filterDesc = filters.length > 0
-      ? filters.map(f => {
-          if (f.values) return `${f.field}: ${f.values.join(', ')}`;
-          if (f.min !== undefined) return `${f.field}: ${f.min} to ${f.max}`;
-          return f.field;
-        }).join('; ')
-      : 'No filters applied (showing all data)';
+  // ── PROMPT ──
+  function buildPrompt(dashName, parsed) {
+    const dataDesc = parsed.headers && parsed.headers.length > 0
+      ? 'Columns: ' + parsed.headers.join(', ') + '\n' +
+        'Total rows: ' + parsed.totalRows + '\n' +
+        'Sample data (first 30 rows):\n' +
+        parsed.rows.slice(0, 30).map(function(r) {
+          return Object.entries(r).map(function(e) { return e[0] + ': ' + e[1]; }).join(', ');
+        }).join('\n')
+      : '(No structured data available for this view)';
 
-    const sheetsDesc = worksheetData.map(ws => {
-      const statsDesc = Object.entries(ws.stats).map(([col, s]) =>
-        `  - ${col}: min=${s.min}, max=${s.max}, sum=${s.sum}, avg=${s.avg}, count=${s.count}`
-      ).join('\n');
-
-      const sampleDesc = ws.sampleRows.slice(0, 20).map(row =>
-        Object.entries(row).map(([k,v]) => `${k}: ${v}`).join(', ')
-      ).join('\n  ');
-
-      return `WORKSHEET: "${ws.name}" (${ws.rowCount} rows, columns: ${ws.columns.join(', ')})
-NUMERIC STATS:
-${statsDesc || '  (no numeric columns)'}
-SAMPLE DATA:
-  ${sampleDesc}`;
-    }).join('\n\n---\n\n');
-
-    return `You are a senior business analyst generating a storyboard narrative from a Tableau dashboard.
-
-DASHBOARD NAME: "${dashboardName}"
-ACTIVE FILTERS: ${filterDesc}
-
-DASHBOARD DATA:
-${sheetsDesc}
-
----
-
-Generate a storyboard in the following exact JSON format. Be specific, causal, and plain-English. Write for a BUSINESS CONSUMER — someone who wants to understand what the data means, not a data analyst. Use the actual numbers from the data. Never be vague. Every finding should reference a specific number or pattern from the data above.
-
-Return ONLY valid JSON, no markdown, no backticks, no preamble:
-
-{
-  "headline": "One bold sentence — the single most important thing this dashboard reveals right now",
-  "standfirst": "2-3 sentences of context. What is this dashboard about, what time period, and is the overall picture good, bad, or mixed?",
-  "findings": [
-    {
-      "type": "critical|warning|positive|neutral",
-      "icon": "one relevant emoji",
-      "text": "A specific, causally-framed finding that references actual numbers. Explain what the number means and why it matters, not just what it is."
-    }
-  ],
-  "so_what": "2-3 sentences telling the reader what this means for them. What should they understand, watch for, or take away? Be direct and specific.",
-  "questions": [
-    {
-      "q": "A question a business consumer would naturally have about this data",
-      "a": "A specific, data-grounded one-line answer"
-    }
-  ],
-  "watch_next": [
-    "A specific forward-looking signal or metric to monitor, grounded in something visible in the data"
-  ]
-}
-
-Rules:
-- findings: 3-6 items, ordered by importance. At least one positive if the data supports it.
-- questions: exactly 5 items
-- watch_next: 2-4 items
-- Use plain English. No jargon. No "it is worth noting that". Say what you mean.
-- Every sentence must be specific to THIS dashboard and THESE numbers. No generic statements.
-- If the data is limited or unclear, say so honestly in the relevant section.`;
+    return 'You are a senior business analyst generating a storyboard narrative from a Tableau dashboard.\n\n' +
+      'DASHBOARD NAME: "' + dashName + '"\n\n' +
+      'DASHBOARD DATA:\n' + dataDesc + '\n\n' +
+      '---\n\n' +
+      'Generate a storyboard in the following exact JSON format. Write for a BUSINESS CONSUMER — ' +
+      'someone who wants to understand what the data means, not a data analyst. ' +
+      'Use the actual numbers from the data. Be specific, causal, and plain-English. ' +
+      'Never be vague. Every finding should reference a specific number or pattern from the data above.\n\n' +
+      'Return ONLY valid JSON, no markdown, no backticks, no preamble:\n\n' +
+      '{\n' +
+      '  "headline": "One bold sentence — the single most important thing this dashboard reveals",\n' +
+      '  "standfirst": "2-3 sentences of context. What is this dashboard about, what time period, and is the overall picture good, bad, or mixed?",\n' +
+      '  "findings": [\n' +
+      '    {\n' +
+      '      "type": "critical|warning|positive|neutral",\n' +
+      '      "icon": "one relevant emoji",\n' +
+      '      "text": "A specific, causally-framed finding that references actual numbers and explains why it matters."\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "so_what": "2-3 sentences telling the reader what this means for them. Be direct and specific.",\n' +
+      '  "questions": [\n' +
+      '    { "q": "A question a business consumer would naturally have", "a": "A specific data-grounded one-line answer" }\n' +
+      '  ],\n' +
+      '  "watch_next": [\n' +
+      '    "A specific forward-looking signal grounded in something visible in the data"\n' +
+      '  ]\n' +
+      '}\n\n' +
+      'Rules: findings 3-6 items ordered by importance. questions exactly 5 items. watch_next 2-4 items. ' +
+      'No jargon. No "it is worth noting that". Every sentence specific to THIS dashboard and THESE numbers.';
   }
 
-  // ── CLAUDE API CALL ──
+  // ── CLAUDE API ──
   async function callClaude(apiKey, prompt) {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -966,168 +627,121 @@ Rules:
         'anthropic-dangerous-direct-browser-api-access': 'true'
       },
       body: JSON.stringify({
-        model: CLAUDE_MODEL,
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      if (response.status === 401) throw new Error('Invalid API key. Check your Anthropic API key and try again.');
-      if (response.status === 429) throw new Error('Rate limit hit. Wait a moment and try again.');
-      throw new Error(err.error?.message || `API error ${response.status}`);
+    if (!resp.ok) {
+      const err = await resp.json().catch(function() { return {}; });
+      if (resp.status === 401) throw new Error('Invalid Anthropic API key.');
+      if (resp.status === 429) throw new Error('Rate limit — wait a moment and try again.');
+      throw new Error(err.error?.message || 'Claude API error ' + resp.status);
     }
 
-    const data = await response.json();
+    const data = await resp.json();
     const text = data.content[0]?.text || '';
-
-    // Parse JSON — strip any accidental markdown fences
     const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     try {
       return JSON.parse(clean);
     } catch(e) {
-      // Try to extract JSON object from response
       const match = clean.match(/\{[\s\S]*\}/);
       if (match) return JSON.parse(match[0]);
-      throw new Error('Claude returned invalid JSON. Try again.');
+      throw new Error('Could not parse Claude response. Try again.');
     }
   }
 
   // ── RENDER STORYBOARD ──
-  function renderStoryboard(dashboardName, filters, story) {
+  function renderStory(dashName, s) {
     const now = new Date();
-    const timeStr = now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const timeStr = now.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' });
+    el('story-meta').textContent = dashName + ' &#183; ' + timeStr;
+    el('footer-time').textContent = timeStr;
 
-    storyMeta.textContent = dashboardName + ' · ' + timeStr;
-    footerTime.textContent = timeStr;
+    const findingsHTML = (s.findings || []).map(function(f) {
+      return '<div class="finding ' + esc(f.type || 'neutral') + '">' +
+        '<div class="finding-icon">' + (f.icon || '&#8226;') + '</div>' +
+        '<div>' + esc(f.text) + '</div>' +
+        '</div>';
+    }).join('');
 
-    // Build filter tags HTML
-    const filterHTML = filters.length > 0
-      ? '<div class="story-filters">' + filters.map(f => {
-          const label = f.values ? f.field + ': ' + f.values.join(', ') : f.field;
-          return '<span class="filter-tag">' + escHtml(label) + '</span>';
-        }).join('') + '</div>'
-      : '';
+    const qaHTML = (s.questions || []).map(function(q) {
+      return '<div class="qa-item">' +
+        '<div class="qa-q"><div class="qa-badge">Q</div>' + esc(q.q) + '</div>' +
+        '<div class="qa-a">' + esc(q.a) + '</div>' +
+        '</div>';
+    }).join('');
 
-    // Build findings HTML
-    const findingsHTML = (story.findings || []).map(f => `
-      <div class="finding-card ${escHtml(f.type || 'neutral')}">
-        <div class="finding-icon">${f.icon || '&#8226;'}</div>
-        <div class="story-text">${escHtml(f.text)}</div>
-      </div>
-    `).join('');
+    const watchHTML = (s.watch_next || []).map(function(w) {
+      return '<div class="watch-item"><span>&#128270;</span>' + esc(w) + '</div>';
+    }).join('');
 
-    // Build Q&A HTML
-    const qaHTML = (story.questions || []).map(q => `
-      <div class="qa-item">
-        <div class="qa-q"><div class="qa-q-icon">Q</div>${escHtml(q.q)}</div>
-        <div class="qa-a">${escHtml(q.a)}</div>
-      </div>
-    `).join('');
+    el('story-body').innerHTML =
+      '<h1 class="story-headline">' + esc(s.headline || 'Dashboard Story') + '</h1>' +
+      '<div class="story-standfirst">' + esc(s.standfirst || '') + '</div>' +
+      '<div class="story-section"><div class="section-label">What matters most</div><div class="finding-list">' + findingsHTML + '</div></div>' +
+      '<div class="story-section"><div class="section-label">What this means for you</div><div class="so-what">' + esc(s.so_what || '') + '</div></div>' +
+      '<div class="story-section"><div class="section-label">Questions this answers</div><div class="qa-list">' + qaHTML + '</div></div>' +
+      '<div class="story-section"><div class="section-label">What to watch next</div><div class="watch-list">' + watchHTML + '</div></div>';
 
-    // Build watch next HTML
-    const watchHTML = (story.watch_next || []).map(w => `
-      <div class="watch-item"><span>&#128270;</span>${escHtml(w)}</div>
-    `).join('');
-
-    storyBody.innerHTML = `
-      ${filterHTML}
-
-      <h1 class="story-headline">${escHtml(story.headline || 'Dashboard Story')}</h1>
-      <div class="story-standfirst story-text"><p>${escHtml(story.standfirst || '')}</p></div>
-
-      <div class="story-section">
-        <div class="story-section-label">What matters most</div>
-        <div class="finding-cards">${findingsHTML}</div>
-      </div>
-
-      <div class="story-section">
-        <div class="story-section-label">What this means for you</div>
-        <div class="story-text"><p>${escHtml(story.so_what || '')}</p></div>
-      </div>
-
-      <div class="story-section">
-        <div class="story-section-label">Questions this answers</div>
-        <div class="qa-list">${qaHTML}</div>
-      </div>
-
-      <div class="story-section">
-        <div class="story-section-label">What to watch next</div>
-        <div class="watch-list">${watchHTML}</div>
-      </div>
-    `;
-
-    showStoryboard();
+    el('main').classList.add('hidden');
+    el('story-page').style.display = 'flex';
   }
 
-  // ── COPY TEXT ──
-  function buildPlainText(story) {
-    if (!story || typeof story !== 'object') return storyText;
-    let txt = '';
-    txt += (story.headline || '') + '\n\n';
-    txt += (story.standfirst || '') + '\n\n';
+  // ── STORY ACTIONS ──
+  el('copy-btn').addEventListener('click', function() {
+    if (!storyData) return;
+    const s = storyData;
+    let txt = (s.headline || '') + '\n\n' + (s.standfirst || '') + '\n\n';
     txt += 'WHAT MATTERS MOST\n';
-    (story.findings || []).forEach(f => { txt += '• ' + f.text + '\n'; });
-    txt += '\nWHAT THIS MEANS FOR YOU\n' + (story.so_what || '') + '\n\n';
+    (s.findings || []).forEach(function(f) { txt += '* ' + f.text + '\n'; });
+    txt += '\nWHAT THIS MEANS FOR YOU\n' + (s.so_what || '') + '\n\n';
     txt += 'QUESTIONS THIS ANSWERS\n';
-    (story.questions || []).forEach(q => { txt += 'Q: ' + q.q + '\nA: ' + q.a + '\n\n'; });
+    (s.questions || []).forEach(function(q) { txt += 'Q: ' + q.q + '\nA: ' + q.a + '\n\n'; });
     txt += 'WHAT TO WATCH NEXT\n';
-    (story.watch_next || []).forEach(w => { txt += '• ' + w + '\n'; });
-    return txt;
-  }
-
-  document.getElementById('copy-btn').addEventListener('click', function() {
-    const txt = buildPlainText(storyText);
-    navigator.clipboard.writeText(txt).then(() => {
-      const btn = document.getElementById('copy-btn');
-      btn.textContent = '✓ Copied!';
-      setTimeout(() => { btn.innerHTML = '&#128203; Copy text'; }, 2000);
-    }).catch(() => {
-      alert('Copy failed — try selecting the text manually.');
+    (s.watch_next || []).forEach(function(w) { txt += '* ' + w + '\n'; });
+    navigator.clipboard.writeText(txt).then(function() {
+      el('copy-btn').textContent = '&#10003; Copied!';
+      setTimeout(function() { el('copy-btn').innerHTML = '&#128203; Copy'; }, 2000);
     });
   });
 
-  document.getElementById('print-btn').addEventListener('click', function() {
-    window.print();
-  });
+  el('print-btn').addEventListener('click', function() { window.print(); });
 
-  document.getElementById('close-btn').addEventListener('click', closeStoryboard);
-  document.getElementById('close-btn-2').addEventListener('click', closeStoryboard);
-  document.getElementById('regenerate-btn').addEventListener('click', function() {
-    closeStoryboard();
-    const apiKey = apiKeyInput.value.trim();
-    if (apiKey) generateStory(apiKey);
-  });
-
-  // ── LOADING STEPS ──
-  function setLoadingStep(n) {
-    for (let i = 1; i <= 5; i++) {
-      const el = document.getElementById('step-' + i);
-      if (!el) continue;
-      el.classList.remove('active', 'done');
-      if (i < n) el.classList.add('done');
-      else if (i === n) el.classList.add('active');
-    }
+  function backToConnect() {
+    el('story-page').style.display = 'none';
+    el('main').classList.remove('hidden');
+    hide('panel-generating');
+    hide('panel-pick');
+    show('panel-connect');
+    selectedView = null;
+    storyData = null;
   }
 
-  // ── HELPERS ──
-  function showLoading() { loadingOverlay.classList.add('visible'); setLoadingStep(1); }
-  function hideLoading() { loadingOverlay.classList.remove('visible'); }
-  function showStoryboard() { storyboardOverlay.classList.add('visible'); }
-  function closeStoryboard() { storyboardOverlay.classList.remove('visible'); }
-  function showError(msg) { errorCard.textContent = msg; errorCard.classList.add('visible'); }
-  function hideError() { errorCard.classList.remove('visible'); }
-  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-  function escHtml(str) {
-    if (typeof str !== 'string') return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  el('new-story-btn').addEventListener('click', function() {
+    el('story-page').style.display = 'none';
+    el('main').classList.remove('hidden');
+    hide('panel-generating');
+    show('panel-pick');
+    hide('dash-list-wrap');
+    el('dash-loading').style.display = 'block';
+    hide('generate-btn');
+    selectedView = null;
+    loadDashboards();
+  });
+
+  el('regen-btn').addEventListener('click', function() {
+    if (!selectedView) return;
+    el('story-page').style.display = 'none';
+    el('main').classList.remove('hidden');
+    show('panel-generating');
+    hide('panel-pick');
+    hideErr('gen-error');
+    generateStory();
+  });
+
+  el('done-btn').addEventListener('click', backToConnect);
 
 });
 </script>
