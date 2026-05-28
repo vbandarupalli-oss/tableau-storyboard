@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Storyboard</title>
-<script src="https://extensionsgallery.tableau.com/extensions/api/v1/tableau.extensions.1.latest.js"></script>
+<!-- Tableau Extensions API - tries multiple sources -->
+<script>
+(function() {
+  // The Extensions API is injected by Tableau itself when loaded as a .trex
+  // We just need to wait for window.tableau to be available
+  // No external script needed - Tableau injects it automatically
+})();
+</script>
 <style>
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -565,6 +572,9 @@ body {
   </div>
 
   <div class="error-card" id="error-card"></div>
+<button class="generate-btn" id="retry-init-btn" style="display:none;background:#5A6070;margin-top:8px;font-size:13px">
+  &#8635; Retry Connection
+</button>
 
   <button class="generate-btn" id="generate-btn">
     <span>&#128214;</span>
@@ -664,7 +674,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function tryInit() {
     initAttempts++;
-    console.log('Tableau init attempt', initAttempts);
+    console.log('Tableau init attempt', initAttempts, 
+      '| tableau:', typeof window.tableau,
+      '| extensions:', typeof window.tableau !== 'undefined' ? typeof window.tableau.extensions : 'n/a'
+    );
 
     if (typeof window.tableau !== 'undefined' && 
         window.tableau.extensions && 
@@ -680,20 +693,48 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(e) { /* ok */ }
       }).catch(function(err) {
         console.warn('initializeAsync error:', err);
-        // Already inside Tableau but init failed — show specific error
-        showError('Tableau Extensions API error: ' + (err.message || err));
+        showError('Tableau init error: ' + (err.message || err));
       });
 
     } else if (initAttempts < MAX_ATTEMPTS) {
-      // API script not ready yet — retry in 500ms
-      setTimeout(tryInit, 500);
+      setTimeout(tryInit, 800);
     } else {
-      showError('Tableau Extensions API not found. Reload the extension or check the .trex file is loaded correctly.');
+      // Tableau object not injected - this usually means the .trex URL 
+      // doesn't match the GitHub Pages URL exactly, or the extension 
+      // needs to be reloaded inside Tableau
+      console.error('window.tableau state:', typeof window.tableau);
+      showError('Tableau not detected after ' + MAX_ATTEMPTS + ' attempts. ' +
+        'Try: right-click the extension panel in Tableau and click Reload. ' +
+        'Also verify the URL in storyboard.trex matches exactly: ' +
+        'https://vbandarupalli-oss.github.io/tableau-storyboard/');
     }
   }
 
-  // Start trying once DOM is ready
   tryInit();
+
+  // Retry button
+  const retryBtn = document.getElementById('retry-init-btn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', function() {
+      initAttempts = 0;
+      tableauInitialized = false;
+      hideError();
+      retryBtn.style.display = 'none';
+      tryInit();
+    });
+  }
+
+  // Show retry button after errors
+  const origShowError = showError;
+  showError = function(msg) {
+    origShowError(msg);
+    if (retryBtn) retryBtn.style.display = 'flex';
+  };
+  const origHideError = hideError;
+  hideError = function() {
+    origHideError();
+    if (retryBtn) retryBtn.style.display = 'none';
+  };
 
   function configure() {
     // Settings dialog — for now just use inline API key input
