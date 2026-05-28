@@ -657,32 +657,43 @@ document.addEventListener('DOMContentLoaded', function() {
   const footerTime = document.getElementById('footer-time');
 
   // ── INIT TABLEAU EXTENSIONS API ──
-  // Try multiple ways to initialize the Tableau Extensions API
-  function initTableau() {
-    if (typeof tableau !== 'undefined' && tableau.extensions) {
-      tableau.extensions.initializeAsync().then(function() {
-        console.log('Tableau Extensions API initialized successfully');
+  // Initialize Tableau Extensions API with retry logic
+  let tableauInitialized = false;
+  let initAttempts = 0;
+  const MAX_ATTEMPTS = 10;
+
+  function tryInit() {
+    initAttempts++;
+    console.log('Tableau init attempt', initAttempts);
+
+    if (typeof window.tableau !== 'undefined' && 
+        window.tableau.extensions && 
+        typeof window.tableau.extensions.initializeAsync === 'function') {
+      
+      window.tableau.extensions.initializeAsync().then(function() {
+        console.log('Tableau Extensions API ready');
+        tableauInitialized = true;
         hideError();
-        // Check if API key is saved in settings
         try {
-          const savedKey = tableau.extensions.settings.get('anthropic_api_key');
+          const savedKey = window.tableau.extensions.settings.get('anthropic_api_key');
           if (savedKey) apiKeyInput.value = savedKey;
-        } catch(e) { /* settings not available yet */ }
+        } catch(e) { /* ok */ }
       }).catch(function(err) {
-        console.warn('Tableau init error:', err);
-        showError('Could not initialize Tableau Extensions API: ' + err.message);
+        console.warn('initializeAsync error:', err);
+        // Already inside Tableau but init failed — show specific error
+        showError('Tableau Extensions API error: ' + (err.message || err));
       });
+
+    } else if (initAttempts < MAX_ATTEMPTS) {
+      // API script not ready yet — retry in 500ms
+      setTimeout(tryInit, 500);
     } else {
-      showError('Tableau Extensions API not found. Make sure this is loaded as a .trex extension inside a Tableau dashboard.');
+      showError('Tableau Extensions API not found. Reload the extension or check the .trex file is loaded correctly.');
     }
   }
 
-  // Try immediately, then retry after a short delay in case script is still loading
-  if (document.readyState === 'complete') {
-    initTableau();
-  } else {
-    window.addEventListener('load', initTableau);
-  }
+  // Start trying once DOM is ready
+  tryInit();
 
   function configure() {
     // Settings dialog — for now just use inline API key input
@@ -705,6 +716,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ── MAIN FLOW ──
   async function generateStory(apiKey) {
+    // Check Tableau is initialized before proceeding
+    if (!tableauInitialized) {
+      showError('Tableau Extensions API is not ready yet. Please wait a moment and try again.');
+      return;
+    }
     showLoading();
     try {
       // Step 1: Connect
@@ -713,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Step 2: Read dashboard metadata
       setLoadingStep(2);
-      const dashboard = tableau.extensions.dashboardContent.dashboard;
+      const dashboard = window.tableau.extensions.dashboardContent.dashboard;
       const dashboardName = dashboard.name;
       const worksheets = dashboard.worksheets;
 
@@ -808,8 +824,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Save API key in settings for convenience
       try {
-        tableau.extensions.settings.set('anthropic_api_key', apiKey);
-        await tableau.extensions.settings.saveAsync();
+        window.tableau.extensions.settings.set('anthropic_api_key', apiKey);
+        await window.tableau.extensions.settings.saveAsync();
       } catch(e) { /* non-critical */ }
 
       await delay(500);
