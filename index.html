@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Storyboard</title>
-<script src="https://cdn.jsdelivr.net/npm/tableau.extensions.api@1.12.0/lib/tableau.extensions.1.latest.js"></script>
+<script src="https://extensionsgallery.tableau.com/extensions/api/v1/tableau.extensions.1.latest.js"></script>
 <style>
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -657,22 +657,31 @@ document.addEventListener('DOMContentLoaded', function() {
   const footerTime = document.getElementById('footer-time');
 
   // ── INIT TABLEAU EXTENSIONS API ──
-  try {
-    tableau = window.tableau;
-    tableau.extensions.initializeAsync({'configure': configure}).then(function() {
-      console.log('Tableau Extensions API initialized');
-      // Check if API key is saved in settings
-      const savedKey = tableau.extensions.settings.get('anthropic_api_key');
-      if (savedKey) {
-        apiKeyInput.value = savedKey;
-      }
-    }).catch(function(err) {
-      console.warn('Tableau init error:', err);
-      showError('Could not connect to Tableau Extensions API. Make sure this is loaded as a Tableau extension.');
-    });
-  } catch(e) {
-    console.warn('Tableau not available:', e);
-    showError('Tableau Extensions API not found. Load this as a .trex extension inside a Tableau dashboard.');
+  // Try multiple ways to initialize the Tableau Extensions API
+  function initTableau() {
+    if (typeof tableau !== 'undefined' && tableau.extensions) {
+      tableau.extensions.initializeAsync().then(function() {
+        console.log('Tableau Extensions API initialized successfully');
+        hideError();
+        // Check if API key is saved in settings
+        try {
+          const savedKey = tableau.extensions.settings.get('anthropic_api_key');
+          if (savedKey) apiKeyInput.value = savedKey;
+        } catch(e) { /* settings not available yet */ }
+      }).catch(function(err) {
+        console.warn('Tableau init error:', err);
+        showError('Could not initialize Tableau Extensions API: ' + err.message);
+      });
+    } else {
+      showError('Tableau Extensions API not found. Make sure this is loaded as a .trex extension inside a Tableau dashboard.');
+    }
+  }
+
+  // Try immediately, then retry after a short delay in case script is still loading
+  if (document.readyState === 'complete') {
+    initTableau();
+  } else {
+    window.addEventListener('load', initTableau);
   }
 
   function configure() {
