@@ -323,8 +323,11 @@ document.addEventListener('DOMContentLoaded', function() {
   let siteId = null;
   let selectedView = null;
   let storyData = null;
-  // CORS proxy - tries multiple options
-  const PROXY = 'https://corsproxy.io/?url=';
+  // Local proxy runs on localhost:3456
+  // Start it with: node proxy.js in your tableau-storyboard folder
+  const LOCAL_PROXY = 'http://localhost:3456/proxy?url=';
+  const REMOTE_PROXY = 'https://corsproxy.io/?url=';
+  let useLocalProxy = true; // will auto-detect
 
   // ── HELPERS ──
   function el(id) { return document.getElementById(id); }
@@ -354,29 +357,29 @@ document.addEventListener('DOMContentLoaded', function() {
     return PROXY + encodeURIComponent(target);
   }
 
-  // Direct fetch with CORS proxy fallback
-  async function proxiedFetch(url, options) {
-    // Try direct first (works if CORS is enabled)
-    // Then try different proxies
-    const proxies = [
-      'https://corsproxy.io/?url=',
-      'https://api.allorigins.win/raw?url=',
-      'https://cors-anywhere.herokuapp.com/'
-    ];
-    
-    let lastErr = null;
-    for (const proxy of proxies) {
+  // Fetch via proxy - tries local proxy first (most reliable), falls back to remote
+  async function proxiedFetch(targetUrl, options) {
+    // Try local proxy first (node proxy.js)
+    if (useLocalProxy) {
       try {
-        const proxyUrl = proxy + encodeURIComponent(url);
-        const resp = await fetch(proxyUrl, options);
-        if (resp.ok || resp.status === 401) return resp; // 401 means proxy worked, auth failed
-        lastErr = new Error('HTTP ' + resp.status);
+        const resp = await fetch(
+          LOCAL_PROXY + encodeURIComponent(targetUrl),
+          { ...options, signal: AbortSignal.timeout(8000) }
+        );
+        if (resp.ok || resp.status === 401 || resp.status === 403) return resp;
       } catch(e) {
-        lastErr = e;
-        continue;
+        // Local proxy not running - switch to remote
+        useLocalProxy = false;
+        console.log('Local proxy not available, using remote proxy');
       }
     }
-    throw lastErr || new Error('All proxies failed');
+
+    // Fall back to corsproxy.io
+    const resp = await fetch(
+      REMOTE_PROXY + encodeURIComponent(targetUrl),
+      options
+    );
+    return resp;
   }
 
   async function tableauFetch(path, options = {}) {
@@ -402,6 +405,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const errData = await resp.json();
         errMsg = errData.error?.detail || errData.error?.summary || errMsg;
       } catch(e) {}
+      if (errMsg.includes('403')) {
+        throw new Error('Authentication failed (403). Check your PAT name and secret are exactly correct. ' +
+          'For best results run the local proxy: node proxy.js in your tableau-storyboard folder.');
+      }
       throw new Error(errMsg);
     }
     return resp.json();
