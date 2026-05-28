@@ -2,17 +2,14 @@
 <manifest manifest-version="0.1" xmlns="http://www.tableau.com/xml/extension_manifest">
   <dashboard-extension id="com.vbandarupalli.tableau.storyboard" extension-version="1.0.0">
     <default-locale>en_US</default-locale>
-    <name resource-id="name">
-      <resource-id>name</resource-id>
-      <resources>
-        <resource language="en_US">📖 Dashboard Storyboard</resource>
-      </resources>
-    </name>
-    <description>Transforms any Tableau dashboard into a plain-English storyboard narrative for business consumers. One click — powered by Claude AI.</description>
+    <name>Dashboard Storyboard</name>
+    <description>Transforms any Tableau dashboard into a plain-English storyboard narrative for business consumers. Powered by Claude AI.</description>
+    <author name="vbandarupalli-oss" email="vbandarupalli@salesforce.com" organization="Tableau Storyboard" website="https://github.com/vbandarupalli-oss"/>
+    <min-api-version>1.7</min-api-version>
     <source-location>
       <url>https://vbandarupalli-oss.github.io/tableau-storyboard/</url>
     </source-location>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhklEQVQ4T2NkoBAwUqifgWoD/v//b8rIyMgjLS3NsGPHjv8DBgxgYGBgYFAKDAxkuH//PsOsWbMY7t+/z3D37l2GgoICBoVff+CeMjIwMCxfvpzh3LlzDFu2bGH4+/cv2HBWVlaGgoIChoSEBIb09HSGxMREhsTERIbdu3czXL58mWHbtm0Mf/78AQCMFhUVFbRSCwAAAABJRU5ErkJggg==</icon>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAFUlEQVQ4jWNgYGD4z8BQDwAEAAH/AL5TQ6sAAAAASUVORK5CYII=</icon>
     <permissions>
       <permission>full data</permission>
     </permissions>
