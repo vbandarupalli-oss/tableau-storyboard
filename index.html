@@ -323,7 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
   let siteId = null;
   let selectedView = null;
   let storyData = null;
-  const PROXY = 'https://corsproxy.io/?'; // CORS proxy for Tableau REST API
+  // CORS proxy - tries multiple options
+  const PROXY = 'https://corsproxy.io/?url=';
 
   // ── HELPERS ──
   function el(id) { return document.getElementById(id); }
@@ -349,7 +350,33 @@ document.addEventListener('DOMContentLoaded', function() {
   // ── TABLEAU REST API ──
   function tableauUrl(path) {
     const base = el('server-url').value.trim().replace(/\/$/, '');
-    return PROXY + encodeURIComponent(base + '/api/3.21' + path);
+    const target = base + '/api/3.21' + path;
+    return PROXY + encodeURIComponent(target);
+  }
+
+  // Direct fetch with CORS proxy fallback
+  async function proxiedFetch(url, options) {
+    // Try direct first (works if CORS is enabled)
+    // Then try different proxies
+    const proxies = [
+      'https://corsproxy.io/?url=',
+      'https://api.allorigins.win/raw?url=',
+      'https://cors-anywhere.herokuapp.com/'
+    ];
+    
+    let lastErr = null;
+    for (const proxy of proxies) {
+      try {
+        const proxyUrl = proxy + encodeURIComponent(url);
+        const resp = await fetch(proxyUrl, options);
+        if (resp.ok || resp.status === 401) return resp; // 401 means proxy worked, auth failed
+        lastErr = new Error('HTTP ' + resp.status);
+      } catch(e) {
+        lastErr = e;
+        continue;
+      }
+    }
+    throw lastErr || new Error('All proxies failed');
   }
 
   async function tableauFetch(path, options = {}) {
@@ -360,7 +387,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     if (authToken) headers['X-Tableau-Auth'] = authToken;
 
-    const resp = await fetch(tableauUrl(path), {
+    const base = el('server-url').value.trim().replace(/\/$/, '');
+    const url = base + '/api/3.21' + path;
+
+    const resp = await proxiedFetch(url, {
       method: options.method || 'GET',
       headers,
       body: options.body ? JSON.stringify(options.body) : undefined
@@ -406,10 +436,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Get data for a specific view using CSV download
   async function getViewData(viewId) {
     const base = el('server-url').value.trim().replace(/\/$/, '');
-    const url = PROXY + encodeURIComponent(
-      base + '/api/3.21/sites/' + siteId + '/views/' + viewId + '/data'
-    );
-    const resp = await fetch(url, {
+    const url = base + '/api/3.21/sites/' + siteId + '/views/' + viewId + '/data';
+    const resp = await proxiedFetch(url, {
       headers: { 'X-Tableau-Auth': authToken, 'Accept': 'text/csv' }
     });
     if (!resp.ok) throw new Error('Could not fetch view data: HTTP ' + resp.status);
